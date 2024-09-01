@@ -36,7 +36,7 @@ int dec(int n)
     return decimal;
 }
 
-void determine_class(char *ip, int *mask, char *class)
+void determine_class(char **ip, int *mask, char *class)
 {
     int a;
     int b;
@@ -44,7 +44,10 @@ void determine_class(char *ip, int *mask, char *class)
     int d;
     int k;
     int count = 0;
-    sscanf(ip, "%d.%d.%d.%d/%d", &a, &b, &c, &d, mask);
+    while (sscanf(*ip, "%d.%d.%d.%d/%d", &a, &b, &c, &d, mask) != 5)
+    {
+        *ip = remplir();
+    }
     if ((a >= 0 && a <= 127) && (b >= 0 && b <= 255) && (c >= 0 && c <= 255) && (d >= 0 && d <= 255))
     {
         *class = 'A';
@@ -135,6 +138,8 @@ void calculate_broadcast(char *adress_network, int mask, char **add_broad, char 
     sscanf(adress_network, "%d.%d.%d.%d", &bytes1, &bytes2, &bytes3, &bytes4);
     sscanf(ip_mask, "%d.%d.%d.%d", &bytesMask1, &bytesMask2, &bytesMask3, &bytesMask4);
 
+    printf("%d %d %d %d \n", bytesMask1, bytesMask2, bytesMask3, bytesMask4);
+
     bytesMask1 = 255 - bytesMask1;
     bytesMask2 = 255 - bytesMask2;
     bytesMask3 = 255 - bytesMask3;
@@ -145,6 +150,7 @@ void calculate_broadcast(char *adress_network, int mask, char **add_broad, char 
     int bytesBrad3 = bytes3 | bytesMask3;
     int bytesBrad4 = bytes4 | bytesMask4;
 
+    printf("%d.%d.%d.%d\n", (bytesBrad1), (bytesBrad2), (bytesBrad3), (bytesBrad4));
     sprintf(*add_broad, "%d.%d.%d.%d", (bytesBrad1), (bytesBrad2), (bytesBrad3), (bytesBrad4));
     printf("Adresse Broadcast : %s\n", *add_broad);
 }
@@ -225,7 +231,7 @@ void exec()
     char class;
     char *ip = remplir();
     int mask;
-    determine_class(ip, &mask, &class);
+    determine_class(&ip, &mask, &class);
 
     char *adress_net = (char *)malloc(sizeof(char) * 16);
     char *adress_broad = (char *)malloc(sizeof(char) * 16);
