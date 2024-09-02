@@ -159,19 +159,15 @@ void number_div(int *n)
 {
     printf("Give the division : ");
     scanf("%d", n);
-}
-
+}                       
 void cut_IP(int netMask, char *IP_Mask, char *ip, int bit, char *adress_net, char *adress_broad, char class)
 {
     int new_netMask = netMask + bit;
-    char *new_IpMask = (char *)malloc(sizeof(char) * 16);
-    adress_mask(new_netMask, &new_IpMask);
-    int bit_hôte = (32 - new_netMask);
-    int nombre_hotes = pow(2, bit_hôte) - 2;
+    int subnet_size = pow(2, (32 - new_netMask));
+    int num_subnets = pow(2, bit);
     int bytes1, bytes2, bytes3, bytes4;
     sscanf(adress_net, "%d.%d.%d.%d", &bytes1, &bytes2, &bytes3, &bytes4);
-    int subnet_size = pow(2, bit_hôte);
-    int num_subnets = pow(2, bit);
+
     printf("    Sous réseau         |           \tbroadcast \n\n");
     for (int i = 0; i < num_subnets; i++)
     {
@@ -198,34 +194,36 @@ void cut_IP(int netMask, char *IP_Mask, char *ip, int bit, char *adress_net, cha
             temp_bytes2 %= 256;
         }
 
-        int first_host = temp_bytes4 + 1;
-        int last_host = temp_bytes4 + nombre_hotes;
+        int broadcast_bytes4 = temp_bytes4 + subnet_size - 1;
+        int broadcast_bytes3 = temp_bytes3;
+        int broadcast_bytes2 = temp_bytes2;
+        int broadcast_bytes1 = temp_bytes1;
 
-        if (last_host >= 256)
+        if (broadcast_bytes4 >= 256)
         {
-            temp_bytes3 += last_host / 256;
-            last_host %= 256;
+            broadcast_bytes3 += broadcast_bytes4 / 256;
+            broadcast_bytes4 %= 256;
         }
 
-        if (temp_bytes3 >= 256)
+        if (broadcast_bytes3 >= 256)
         {
-            temp_bytes2 += temp_bytes3 / 256;
-            temp_bytes3 %= 256;
+            broadcast_bytes2 += broadcast_bytes3 / 256;
+            broadcast_bytes3 %= 256;
         }
 
-        if (temp_bytes2 >= 256)
+        if (broadcast_bytes2 >= 256)
         {
-            temp_bytes1 += temp_bytes2 / 256;
-            temp_bytes2 %= 256;
+            broadcast_bytes1 += broadcast_bytes2 / 256;
+            broadcast_bytes2 %= 256;
         }
 
-        int broadcast = last_host + 1;
         printf("-----------------------------------------------------------------------------------------------\n");
-            printf("|Sous réseau %d:%35d.%d.%d.%d\n", i + 1, temp_bytes1, temp_bytes2, temp_bytes3, temp_bytes4);
-        printf("|Sous Adresse Broadcast %d:%24d.%d.%d.%d\n\n", i + 1, temp_bytes1, temp_bytes2, temp_bytes3, broadcast);
+        printf("|Sous réseau %d:%35d.%d.%d.%d\n", i + 1, temp_bytes1, temp_bytes2, temp_bytes3, temp_bytes4);
+        printf("|Sous Adresse Broadcast %d:%24d.%d.%d.%d\n\n", i + 1, broadcast_bytes1, broadcast_bytes2, broadcast_bytes3, broadcast_bytes4);
         printf("-----------------------------------------------------------------------------------------------\n");
     }
 }
+
 void exec()
 {
     char class;
